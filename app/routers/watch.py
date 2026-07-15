@@ -5,10 +5,13 @@ from ..utils import price_num
 
 router = APIRouter()
 
+ALLOWED_TYPES = {"creature", "instant", "sorcery", "artifact", "enchantment", "planeswalker", "land", "battle"}
+
 
 class WatchRequest(BaseModel):
     formats: list[str]
     identity: str = "WUBRG"
+    types: list[str] = []
 
 
 @router.post("/watch")
@@ -18,9 +21,15 @@ async def format_watch(req: WatchRequest):
         return {"error": "Nessun set trovato."}
 
     identity = "".join([c for c in req.identity.upper() if c in "WUBRG"]) or "WUBRG"
+    types = [t.lower() for t in req.types if t.lower() in ALLOWED_TYPES]
+    type_clause = ""
+    if types:
+        type_clause = " (" + " or ".join(f"type:{t}" for t in types) + ")"
+
     seen: dict = {}
     for fmt in req.formats:
-        cards = await sf.search(f"set:{latest['code']} legal:{fmt} id<={identity}", order="released")
+        query = f"set:{latest['code']} legal:{fmt} id<={identity}{type_clause}"
+        cards = await sf.search(query, order="released")
         for c in cards:
             if c["name"] not in seen:
                 seen[c["name"]] = {"card": c, "formats": [fmt]}
