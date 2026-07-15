@@ -43,6 +43,17 @@ def init_db():
             price REAL NOT NULL,
             UNIQUE(user_id, profile, card_name)
         );
+        CREATE TABLE IF NOT EXISTS shared_decklists (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            decklist_text TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS power_certificates (
+            id TEXT PRIMARY KEY,
+            stats_json TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        );
         CREATE TABLE IF NOT EXISTS trade_cards (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             session_code TEXT NOT NULL,
