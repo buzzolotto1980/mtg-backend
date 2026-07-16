@@ -71,6 +71,11 @@ async def sets():
     return data.get("data", [])
 
 
+async def autocomplete(q: str):
+    data = await _get("/cards/autocomplete", {"q": q})
+    return data.get("data", [])
+
+
 async def latest_set():
     all_sets = await sets()
     today = time.strftime("%Y-%m-%d")

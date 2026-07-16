@@ -63,4 +63,18 @@ def init_db():
         """
     )
     conn.commit()
+
+    # Migrazioni per colonne aggiunte dopo il primo rilascio: se il database
+    # esiste gia' (deploy precedente), ALTER TABLE le aggiunge una volta sola;
+    # se esistono gia', l'errore viene semplicemente ignorato.
+    for statement in (
+        "ALTER TABLE box_locations ADD COLUMN image_url TEXT",
+        "ALTER TABLE box_locations ADD COLUMN price REAL",
+    ):
+        try:
+            cur.execute(statement)
+            conn.commit()
+        except sqlite3.OperationalError:
+            pass
+
     conn.close()
